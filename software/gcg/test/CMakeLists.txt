@@ -1,0 +1,48 @@
+ENABLE_TESTING ()
+
+INCLUDE_DIRECTORIES (../include ../util)
+
+FIND_LIBRARY (GCGLIB NAMES gcgtest PATHS ../lib)
+FIND_LIBRARY (TP3LIB NAMES tp3 PATHS ../../libtp3/lib)
+FIND_LIBRARY (TP12LIB NAMES tp12 PATHS ../../libtp12/lib)
+FIND_LIBRARY (CFLIB NAMES cflora PATHS ../../libcflora/lib)
+FIND_LIBRARY (UVLIB NAMES uv PATHS /usr/local/lib)
+FIND_LIBRARY (INILIB NAMES uv PATHS ../../iniparser)
+
+ADD_EXECUTABLE (test_device test_device.c)
+TARGET_LINK_LIBRARIES (test_device ${GCGLIB})
+TARGET_LINK_LIBRARIES (test_device ${TP3LIB})
+TARGET_LINK_LIBRARIES (test_device ${UVLIB})
+TARGET_LINK_LIBRARIES (test_device ${TP12LIB})
+TARGET_LINK_LIBRARIES (test_device ${CFLIB})
+TARGET_LINK_LIBRARIES (test_device ${INILIB})
+
+ADD_EXECUTABLE (test_conn test_conn.c)
+TARGET_LINK_LIBRARIES (test_conn ${GCGLIB})
+TARGET_LINK_LIBRARIES (test_conn ${TP3LIB})
+TARGET_LINK_LIBRARIES (test_conn ${UVLIB})
+TARGET_LINK_LIBRARIES (test_conn ${TP12LIB})
+TARGET_LINK_LIBRARIES (test_conn ${CFLIB})
+TARGET_LINK_LIBRARIES (test_conn ${INILIB})
+
+ADD_EXECUTABLE (test_msgbuf test_msgbuf.c)
+TARGET_LINK_LIBRARIES (test_msgbuf ${GCGLIB})
+TARGET_LINK_LIBRARIES (test_msgbuf ${TP3LIB})
+TARGET_LINK_LIBRARIES (test_msgbuf ${TP12LIB})
+TARGET_LINK_LIBRARIES (test_msgbuf ${UVLIB})
+TARGET_LINK_LIBRARIES (test_msgbuf ${CFLIB})
+TARGET_LINK_LIBRARIES (test_msgbuf ${INILIB})
+
+ADD_EXECUTABLE (test_control test_control.c)
+TARGET_LINK_LIBRARIES (test_control ${GCGLIB})
+TARGET_LINK_LIBRARIES (test_control ${TP3LIB})
+TARGET_LINK_LIBRARIES (test_control ${TP12LIB})
+TARGET_LINK_LIBRARIES (test_control ${UVLIB})
+TARGET_LINK_LIBRARIES (test_control ${CFLIB})
+TARGET_LINK_LIBRARIES (test_control ${INILIB})
+
+ADD_TEST (unittest1 test_device)
+ADD_TEST (unittest2 test_conn)
+ADD_TEST (unittest3 test_msgbuf)
+ADD_TEST (unittest4 test_control)
+
