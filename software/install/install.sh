@@ -25,9 +25,9 @@ update-rc.d -f cflora remove
 ln -s "$TARGET_DIR/bin/cflora" /etc/init.d/cflora
 update-rc.d cflora defaults
 
-cp "$SOURCE_DIR/gos/bin/gos" "$TARGET_DIR/bin/"
-cp "$SOURCE_DIR/gcg/bin/gcg" "$TARGET_DIR/bin/"
-cp "$SOURCE_DIR/node/bin/node" "$TARGET_DIR/bin/"
+cp "$SOURCE_DIR/gos/release/bin/gos" "$TARGET_DIR/bin/"
+cp "$SOURCE_DIR/gcg/release/bin/gcg" "$TARGET_DIR/bin/"
+cp "$SOURCE_DIR/node/release/bin/node" "$TARGET_DIR/bin/"
 
 cp "$SOURCE_DIR/conf/cflora-server.ini" "$TARGET_DIR/conf/"
 cp "$SOURCE_DIR/conf/cflora-device.ini" "$TARGET_DIR/conf/"

@@ -35,9 +35,14 @@ cflora 는 cubieboard 2를 사용하고 있습니다. 이를 위한 이미지 �
 ### Dependency
 cflora 는 다음의 오픈소스를 사용하고 있습니다.
 * [iniparser](https://github.com/ndevilla/iniparser)
-* [libuv](https://github.com/libuv/libuv)
-* [mysql](https://www.mysql.com)
 * [libtp3](https://github.com/ezfarm-farmcloud/libtp3)
+* [mysql](https://www.mysql.com)
+
+iniparser 와 libtp3는 git submodule 로 연동되어 있습니다. 따라서 다음과 같이 입력하면 컴파일을 위한 소스들을 받아올 수 있습니다.
+```
+git submodule init
+git submodule update
+```
 
 ### Build Instructions
 cflora 는 cmake 를 이용해서 컴파일이 가능합니다. 개별 폴더로 이동하셔서 다음의 명령을 입력하시면 컴파일이 됩니다.
@@ -53,6 +58,12 @@ make
 * gcg
 * gos
 
-마지막으로 install 폴더의 install.sh 를 실행하시면 됩니다.
+일련의 과정을 한번에 수행하기 위해서 install 폴더의 build.sh를 실행하실 수 있습니다.
+```
+cd install
+./build.sh
+```
+
+마지막으로 설치를 위해 install 폴더의 install.sh 를 실행하시면 됩니다.
 
 

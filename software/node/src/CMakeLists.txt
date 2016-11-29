@@ -3,7 +3,7 @@ PROJECT (node)
 
 SET (EXECUTABLE_OUTPUT_PATH ../bin)
 
-FIND_LIBRARY (TP12LIB NAMES tp12 PATHS ../../libtp12/lib)
+FIND_LIBRARY (TP12LIB NAMES tp12 PATHS ../../libtp12/release/lib)
 FIND_LIBRARY (INIPLIB NAMES iniparser PATHS ../../iniparser)
 
 INCLUDE_DIRECTORIES (../include ../../libtp12/include /usr/local/include)
