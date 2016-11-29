@@ -6,7 +6,6 @@ FIND_LIBRARY (GOSLIB NAMES gostest PATHS ../lib)
 FIND_LIBRARY (TP3LIB NAMES tp3 PATHS ../../libtp3/lib)
 FIND_LIBRARY (CFLIB NAMES cflora PATHS ../../libcflora/lib)
 FIND_LIBRARY (UVLIB NAMES uv PATH /usr/local/lib)
-FIND_LIBRARY (SQLITELIB NAMES sqlite3 PATH /usr/local/lib)
 
 ADD_EXECUTABLE (test_device test_device.c)
 TARGET_LINK_LIBRARIES (test_device ${GOSLIB})

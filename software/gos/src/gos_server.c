@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include <uv.h>
-#include <sqlite3.h>
 #include <tp3.h>
 #include <cf.h>
 

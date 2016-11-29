@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <sqlite3.h>
 #include <uv.h>
 
 #include <tp3.h>
