@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include <cf_base.h>
-#include <cf_db.h>
+#include <cf_db_mysql.h>
 
 #define _CF_MAX_QUERYLEN	1024
 #define _CF_MAX_DEVICELEN	30
