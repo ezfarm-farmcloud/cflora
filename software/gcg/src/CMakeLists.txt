@@ -5,10 +5,10 @@ SET (EXECUTABLE_OUTPUT_PATH ../bin)
 SET (LIBRARY_OUTPUT_PATH ../lib)
 
 FIND_LIBRARY (UVLIB NAMES uv PATHS /usr/local/lib)
-FIND_LIBRARY (TP3LIB NAMES tp3 PATHS ../../libtp3/release/lib)
-FIND_LIBRARY (INILIB NAMES iniparser PATHS ../../iniparser)
-FIND_LIBRARY (TP12LIB NAMES tp12 PATHS ../../libtp12/release/lib)
-FIND_LIBRARY (CFLIB NAMES cflora PATHS ../../libcflora/release/lib)
+FIND_LIBRARY (TP3LIB NAMES libtp3_static.a tp3 PATHS ../../libtp3/release/lib)
+FIND_LIBRARY (INILIB NAMES libiniparser.a iniparser PATHS ../../iniparser)
+FIND_LIBRARY (TP12LIB NAMES libtp12.a tp12 PATHS ../../libtp12/release/lib)
+FIND_LIBRARY (CFLIB NAMES libcflora.a cflora PATHS ../../libcflora/release/lib)
 
 INCLUDE_DIRECTORIES (../include ../../libcflora/include ../../libtp3/include ../../libtp12/include /usr/local/include)
 

@@ -4,8 +4,8 @@ PROJECT (gos)
 SET (EXECUTABLE_OUTPUT_PATH ../bin)
 SET (LIBRARY_OUTPUT_PATH ../lib)
 
-FIND_LIBRARY (CFLIB NAMES cflora PATHS ../../libcflora/release/lib)
-FIND_LIBRARY (TP3LIB NAMES tp3 PATHS ../../libtp3/release/lib)
+FIND_LIBRARY (CFLIB NAMES libcflora.a cflora PATHS ../../libcflora/release/lib)
+FIND_LIBRARY (TP3LIB NAMES libtp3_static.a tp3 PATHS ../../libtp3/release/lib)
 FIND_LIBRARY (UVLIB NAMES uv PATH /usr/local/lib)
 FIND_LIBRARY (MYSQLLIB NAMES mysqlclient PATH /usr/lib/arm-linux-gnueabihf/)
 
