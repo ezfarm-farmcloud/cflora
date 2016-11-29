@@ -9,7 +9,6 @@
 #endif
 
 #include <uv.h>
-#include <sqlite3.h>
 #include <cf.h>
 #include <tp3.h>
 #include <util.h>
