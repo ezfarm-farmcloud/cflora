@@ -1,8 +1,9 @@
 #!/bin/bash
 
-cd ..
+cd ../..
 git submodule init
 git submodule update
+cd software
 
 # iniparser compile
 cd iniparser
