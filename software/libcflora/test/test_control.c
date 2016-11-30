@@ -18,14 +18,14 @@ test_initcontrol () {
 	ASSERT_OK (cf_init_db (&db, TESTDB), "fail to init");
 	ASSERT_OK (cf_db_open (&db), "fail to open");
 
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "create table gos_environment (obstime datetime not null, device_id integer not null, svalue text, nvalue double);", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "create table gos_environment (obstime datetime not null, device_id integer not null, svalue text, nvalue double);", NULL, 0, &errmsg), errmsg);
 
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime', '-300 seconds'), 1, 20.0)", NULL, 0, &errmsg), errmsg);
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime', '-100 seconds'), 1, 2.0)", NULL, 0, &errmsg), errmsg);
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime', '-100 seconds'), 2, 100.0)", NULL, 0, &errmsg), errmsg);
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime'), 2, 50.0)", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime', '-300 seconds'), 1, 20.0)", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime', '-100 seconds'), 1, 2.0)", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime', '-100 seconds'), 2, 100.0)", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "insert into gos_environment (obstime, device_id, nvalue) values (datetime('now', 'localtime'), 2, 50.0)", NULL, 0, &errmsg), errmsg);
 
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "create table gos_control (id integer not null primary key, exectime datetime not null, device_id integer not null, argument integer, ctrltype text not null, rule integer, updatetime datetime not null);", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "create table gos_control (id integer not null primary key, exectime datetime not null, device_id integer not null, argument integer, ctrltype text not null, rule integer, updatetime datetime not null);", NULL, 0, &errmsg), errmsg);
 
 	ASSERT_OK (cf_db_close (&db), "fail to close");
 	cf_release_db (&db);

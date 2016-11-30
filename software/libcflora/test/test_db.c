@@ -29,9 +29,9 @@ test_execute () {
 	ASSERT_OK (cf_init_db (&db, TESTDB), "fail to init");
 	ASSERT_OK (cf_db_open (&db), "fail to open");
 
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "create table temp (id integer, value double)", NULL, 0, &errmsg), errmsg);
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "insert into temp (id, value) values (1, 2.0)", NULL, 0, &errmsg), errmsg);
-	ASSERT (CF_DB_OK == cf_db_exec (&db, "insert into temp (id, value) values (3, 4.0)", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "create table temp (id integer, value double)", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "insert into temp (id, value) values (1, 2.0)", NULL, 0, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_exec (&db, "insert into temp (id, value) values (3, 4.0)", NULL, 0, &errmsg), errmsg);
 
 	ASSERT_OK (cf_db_close (&db), "fail to close");
 	cf_release_db (&db);
@@ -49,7 +49,7 @@ test_read () {
 	ASSERT_OK (cf_init_db (&db, TESTDB), "fail to init");
 	ASSERT_OK (cf_db_open (&db), "fail to open");
 
-	ASSERT (CF_DB_OK == cf_db_get_table (&db, "select id, value from temp", &results, &rows, &columns, &errmsg), errmsg);
+	ASSERT (CF_OK == cf_db_get_table (&db, "select id, value from temp", &results, &rows, &columns, &errmsg), errmsg);
 	for (i = 1; i <= rows; i++) {
 		for (j = 0; j < columns; j++) {
 			ASSERT ((i * rows + j + 1 - rows) == atof (results[i*rows + j]), "values are not matched");

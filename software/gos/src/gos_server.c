@@ -79,7 +79,7 @@ gos_check_auto_control (gos_server_t *pserver, gos_config_t *pconfig) {
 	char **results;  
 
 	rc = cf_db_get_table (db, "select control from gos_configuration", &results, &rows, &columns, &errmsg);   
-	if (rc != CF_DB_OK) {          
+	if (rc != CF_OK) {          
 		CF_ERR_LOG ("database query execution (check auto control) failed. %s", errmsg);
 		cf_db_free (errmsg);      
 		return 0;

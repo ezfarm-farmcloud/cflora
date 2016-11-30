@@ -18,7 +18,7 @@ cf_get_environment (cf_db_t *pdb, int sensorid, double *value, int ntime) {
 
 	rc = cf_db_get_table (pdb, query, &result, &rows, &columns, &errmsg);
 
-	if (CF_DB_OK == rc) {
+	if (CF_OK == rc) {
 		*value = atof (result[1]);
 		cf_db_free_table (result);
 		return CF_OK;
@@ -50,7 +50,7 @@ cf_get_environments (cf_db_t *pdb, int num, int *sensorid, int *rsensor, double 
 		ntime);
 
 	rc = cf_db_get_table (pdb, query, &result, &rows, &columns, &errmsg);
-	if (CF_DB_OK == rc) {
+	if (CF_OK == rc) {
 		for (i = 1; i <= rows; i++) {
 			rsensor[i - 1] = (int)atof (result[i * columns]);
 			values[i - 1] = atof (result[i * columns + 1]);
@@ -81,7 +81,7 @@ cf_execute_command (cf_db_t *pdb, int actuatorid, int argument, int wtime) {
 		actuatorid, argument, wtime);
 
 	rc = cf_db_exec(pdb, query, NULL, 0, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database error : %s", errmsg);
 		cf_db_free (errmsg);
 		return CF_ERR;

@@ -177,7 +177,7 @@ _gos_load_dailyacc (gos_cvt_vsensor_arg_t *parg, int devid, cf_db_t *db) {
 				"where device_id = %d and ptype = 'sensor'", devid);
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (for getting devicemap) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		CF_FREE (pconfig);
@@ -215,7 +215,7 @@ _gos_load_dnwhumidity (gos_cvt_vsensor_arg_t *parg, int devid, cf_db_t *db) {
 				"where device_id = %d and ptype = 'sensor'", devid);
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (for getting devicemap) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		CF_FREE (pconfig);

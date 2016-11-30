@@ -276,7 +276,5 @@ extern MYSQL_BIND	*g_pBind ;
 		mysql_stmt_close(st); \
 	} while(0) ;
 
-#define CF_DB_OK	1
-
 #endif
 #endif

@@ -253,7 +253,7 @@ gos_timer_cb (uv_timer_t *handle) {
 	cf_db_busy_timeout (db, BUSY_TIMEOUT);
 
 	rc = cf_db_exec (db, "PRAGMA journal_mode=WAL", NULL, 0, NULL);
-	CF_ERR_RETURN (rc != CF_DB_OK, "database journal mode change failed.");
+	CF_ERR_RETURN (rc != CF_OK, "database journal mode change failed.");
 #endif	
 	// 정확한 시간 타임에 저장과 룰 검사를 하기위해 시간 체트하는 기능 추가 
 	// by chj 2015.9.27

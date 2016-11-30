@@ -149,7 +149,7 @@ gos_load_devinfo (gos_devinfo_t *pdevinfo, cf_db_t *db) {
 
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (get devices) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		return CF_ERR;
@@ -258,7 +258,7 @@ gos_add_devices (gos_devinfo_t *pdevinfo, gos_config_t *pconfig, int size, gos_d
 	CF_BEGIN_TRANSACTION(db);
 
 	rc = cf_db_prepare_v2 (db, query, strlen(query), &stmt, &tail);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("sql query preparation failed.");
 		CF_ERR_LOG (cf_db_errmsg (db));
 		cf_db_close (db);
@@ -410,7 +410,7 @@ gos_get_last_deviceid (cf_db_t *db) {
 	rowid = cf_db_last_insert_rowid (db);
 	sprintf (query, "select id from gos_devices where rowid = %d", rowid);
 	rc = cf_db_get_table (db, query, &results, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("getting device id failed. %s", errmsg);
 		cf_db_free (errmsg);
 		return _GOS_NO_ID;
@@ -440,7 +440,7 @@ gos_sync_devices (gos_devinfo_t *pdevinfo, gos_config_t *pconfig) {
 	CF_BEGIN_TRANSACTION(db);
 
 	rc = cf_db_prepare_v2 (db, query, strlen(query), &stmt, &tail);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("sql query preparation failed. %s", cf_db_errmsg (db));
 		cf_db_close (db);
 		return CF_ERR;
@@ -474,7 +474,7 @@ gos_sync_devices (gos_devinfo_t *pdevinfo, gos_config_t *pconfig) {
 			}
 		}
 		rc = cf_db_step (stmt);
-		if (rc != CF_DB_OK) {
+		if (rc != CF_OK) {
 			CF_ERR_LOG ("sql query execution failed. %s", cf_db_errmsg (db));
 			CF_ROLLBACK (db);
 			cf_db_close (db);
@@ -924,7 +924,7 @@ gos_load_driver (gos_dev_t *pdev, cf_db_t *db) {
 	sprintf(query, "select channel, name from gos_device_portmap where opt = 'asensor' and device_id = %d", pdev->id);
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (get device convertmap) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		return CF_ERR;
@@ -961,7 +961,7 @@ gos_load_convertinfo (gos_dev_t *pdev, cf_db_t *db) {
 	sprintf(query, "select ctype, configuration, offset from gos_device_convertmap where device_id = %d", pdev->id);
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (get device convertmap) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		return CF_ERR;
@@ -1098,7 +1098,7 @@ gos_insert_control_history (gos_cmd_t *pcmd, cf_db_t *db) {
 	}
 
 	rc = cf_db_exec(db, query, NULL, 0, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("control history error : %s, %s", query, errmsg);
 		cf_db_free (errmsg);
 		return CF_ERR;
@@ -1122,7 +1122,7 @@ gos_update_control (gos_cmd_t *pcmd, cf_db_t *db) {
 		pcmd->workcnt, pcmd->stopcnt, senttime, pcmd->stat, pcmd->id);
 
 	rc = cf_db_exec(db, query, NULL, 0, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("control update error : %s, %s", query, errmsg);
 		cf_db_free (errmsg);
 		return CF_ERR;
@@ -1139,7 +1139,7 @@ gos_delete_control (gos_cmd_t *pcmd, cf_db_t *db) {
 
 	sprintf (query, "delete from gos_control where id = %d", pcmd->id);
 	rc = cf_db_exec(db, query, NULL, 0, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("control delete error : %s, %s", query, errmsg);
 		cf_db_free (errmsg);
 		return CF_ERR;
@@ -1227,7 +1227,7 @@ gos_read_commands (gos_devinfo_t *pdevinfo, cf_db_t *db) {
 			"order by device_id asc, id asc");
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (read command) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		return CF_ERR;
@@ -1472,7 +1472,7 @@ gos_reset_sequence_of_control (cf_db_t *db) {
 	rc = cf_db_get_table (db, "select max(id) from (select max(id) as id from gos_control c "
 							"union all select max(id) as id from gos_control_history h) t", 
 							&results, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("getting max control id failed. %s", errmsg);
 		cf_db_free (errmsg);
 		return _GOS_NO_ID;
@@ -1483,7 +1483,7 @@ gos_reset_sequence_of_control (cf_db_t *db) {
 
 	sprintf (query, "alter table gos_control auto_increment = %d", maxid);
 	rc = cf_db_exec(db, query, NULL, 0, &errmsg); 
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("gos_control sequence setting failed :%s", errmsg);
 		cf_db_free (errmsg);
 		return CF_ERR;
@@ -1504,7 +1504,7 @@ gos_init_control (gos_config_t *pconfig) {
 		"insert into gos_control_history "
 		"(select * from gos_control where status > 0 )", NULL, 0, &errmsg);
 
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("move previous controls into history failed :%s", errmsg);
 		cf_db_free (errmsg);
 		return CF_ERR;
@@ -1513,7 +1513,7 @@ gos_init_control (gos_config_t *pconfig) {
 	rc = cf_db_exec(&(pconfig->db), 
 		"delete from gos_control where status != 0", NULL, 0, &errmsg);
 
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("delete previous controls failed :%s", errmsg);
 		cf_db_free (errmsg);
 		return CF_ERR;

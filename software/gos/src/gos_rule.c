@@ -85,7 +85,7 @@ gos_load_rules_acts (gos_rule_t *prule, int ruleid, cf_db_t *db) {
 	sprintf (query, "select istrue, actuator_id, argument, workingtime from gos_control_rule_action where id = %d order by istrue asc", ruleid);
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (get rule action) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		return CF_ERR;
@@ -148,7 +148,7 @@ gos_load_rules_exps (gos_rule_t *prule, int ruleid, cf_db_t *db) {
 	sprintf (query, "select ftime, ttime, operator, sensor_id, fvalue, tvalue from gos_control_rule_condition where id = %d order by ftime, ttime", ruleid);
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (get rule expression) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		return CF_ERR;
@@ -212,7 +212,7 @@ gos_load_rules (gos_ruleset_t *pruleset, cf_db_t *db) {
 	int rows, columns, rc, i;
 
 	rc = cf_db_get_table (db, query, &result, &rows, &columns, &errmsg);
-	if (rc != CF_DB_OK) {
+	if (rc != CF_OK) {
 		CF_ERR_LOG ("database query execution (get rules) failed. %s", errmsg);
 		cf_db_free(errmsg);
 		return CF_ERR;
@@ -347,7 +347,7 @@ gos_execute_action (gos_ract_t *pact, int num, int ruleid, cf_db_t *db) {
 				date_now, pact[i].actuatorid, pact[i].arg, ruleid, pact[i].wtime);
 
 		rc = cf_db_exec(db, query, NULL, 0, &errmsg);
-		if (rc != CF_DB_OK) {
+		if (rc != CF_OK) {
 			CF_ERR_LOG ("database error : %s", errmsg);
 			cf_db_free (errmsg);
 			CF_ROLLBACK (db);
