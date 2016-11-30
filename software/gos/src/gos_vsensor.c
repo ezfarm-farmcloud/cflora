@@ -189,6 +189,9 @@ _gos_load_dailyacc (gos_cvt_vsensor_arg_t *parg, int devid, cf_db_t *db) {
 			pconfig->device_id = atoi (result[i * columns + 1]);
 		}
 	}
+	pconfig->previous = 0;
+	pconfig->last = time(NULL);
+	pconfig->today = 32;
 	CF_VERBOSE (CF_VERBOSE_LOW, "virtual Sensor [%d] config : sensor [%d].", 
 				devid, pconfig->device_id);
 	parg->config = (void *)pconfig;
