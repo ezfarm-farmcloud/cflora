@@ -1058,8 +1058,7 @@ gos_set_command (gos_cmd_t *pcmd, int id, int exectm, int deviceid, int argument
 		pcmd->tm = worktime;
 		pcmd->ctrlarg = gos_get_actuator_argument (argument, worktime);
 	} else  {
-		pcmd->arg = 0;
-		pcmd->tm = _GOS_ACTARG_TIMEFILTER;
+        gos_parse_actuator_argument (ctrlarg, &(pcmd->arg), &(pcmd->tm));
 		pcmd->ctrlarg = ctrlarg;
 	}
 
