@@ -120,9 +120,9 @@ int ReadDevice_Config(void)
 
 	 //CONTROL_PORT = iniparser_getint(ini, "GENERAL:CONTROL-SERIAL-PORT", 0 );
 	 //PORT_SPEED = iniparser_getint(ini, "GENERAL:SERIAL-PORT-SPEED", 115200 );
-	 COMM_SENSOR[0].PORT = iniparser_getint(ini, "GENERAL:CONTROL-SERIAL-PORT", 0 );
+	 COMM_SENSOR[0].PORT = 0; //iniparser_getint(ini, "GENERAL:CONTROL-SERIAL-PORTID", 0 );
 	 COMM_SENSOR[0].SPEED = iniparser_getint(ini, "GENERAL:SERIAL-PORT-SPEED", 115200 );
-	 strcpy (COMM_SENSOR[0].TTY, "/dev/ttyS1");
+	 strcpy (COMM_SENSOR[0].TTY, iniparser_getstring(ini, "GENERAL:CONTROL-SERIAL-TTY", "/dev/ttyS1"));
 
 	 HouseControl_ID = iniparser_getint(ini, "GENERAL:HOUSECONTROL_ID", 0 );
 
