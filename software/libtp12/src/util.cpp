@@ -27,7 +27,7 @@ COMM_SENSOR_STRUCT COMM_SENSOR[MAX_COMM_SENSOR] ;
 void PacketVariable_init(void)
 {
 	InstalledSensorCount=24;
-	InstalledActuatorCount=8;
+	InstalledActuatorCount=16;
 	InstalledSensorNodeCount=3;
 	InstalledActuatorNodeCount=1;
 
@@ -62,7 +62,7 @@ void PacketVariable_init(void)
 
 	for( int i=0; i < MAX_SENSOR_COUNT ;i++)
 	{
-		SI[i].NODE_ID =i/8 ;
+		SI[i].NODE_ID =i/16 ;
 		SI[i].data.id =i ;
 		SI[i].data.type =0x00 ;
 		SI[i].data.value =i;
@@ -74,7 +74,7 @@ void PacketVariable_init(void)
 	}
 	for( int i=0; i < MAX_ACTUATOR_COUNT ;i++)
 	{
-		AI[i].NODE_ID =i/8 ;
+		AI[i].NODE_ID =i/16 ;
 		AI[i].data.id =i ;
 		AI[i].data.type =0x00 ;
 		AI[i].data.value =0;
@@ -103,12 +103,19 @@ int ReadDevice_Config(void)
 
 
    //ini = iniparser_load((char*)"../../conf/cflora-device.ini");
-   //ini = iniparser_load((char*)"cflora-device.ini");
-   ini = iniparser_load((char*)"../conf/cflora-device.ini");
-    if (ini==NULL) {
-        fprintf(stderr, "cannot parse file: cflora-device.ini\n");
+   ini = iniparser_load((char*)"./cflora-device.ini");
+   if (ini==NULL) {
+        fprintf(stderr, "cannot parse file: ../../conf/cflora-device.ini\n");
+        return -1 ;
+   }
+
+ /*  
+   ini = iniparser_load((char*)"/home/pi/cflora/software/conf/cflora-device.ini");
+   if (ini==NULL) {
+        fprintf(stderr, "cannot parse file: /home/pi/cflora/software/conf/cflora-device.ini\n");
         return -1 ;
     }
+*/
   //  iniparser_dump(ini, stderr);
 
    InstalledSensorNodeCount = iniparser_getint(ini, "GENERAL:SENSOR-NODE-COUNT", 0);
@@ -121,7 +128,7 @@ int ReadDevice_Config(void)
 	 //CONTROL_PORT = iniparser_getint(ini, "GENERAL:CONTROL-SERIAL-PORT", 0 );
 	 //PORT_SPEED = iniparser_getint(ini, "GENERAL:SERIAL-PORT-SPEED", 115200 );
 	 COMM_SENSOR[0].PORT = 0; //iniparser_getint(ini, "GENERAL:CONTROL-SERIAL-PORTID", 0 );
-	 COMM_SENSOR[0].SPEED = iniparser_getint(ini, "GENERAL:SERIAL-PORT-SPEED", 115200 );
+	 COMM_SENSOR[0].SPEED = iniparser_getint(ini, "GENERAL:SERIAL-PORT-SPEED", 57600 );
 	 strcpy (COMM_SENSOR[0].TTY, iniparser_getstring(ini, "GENERAL:CONTROL-SERIAL-TTY", "/dev/ttyS1"));
 
 	 HouseControl_ID = iniparser_getint(ini, "GENERAL:HOUSECONTROL_ID", 0 );
@@ -144,10 +151,10 @@ int ReadDevice_Config(void)
 	u32  COUNT;   // �ٿ�ī��Ʈ(�ʴ���)
 */
 
-		for( b = 0 ; b < InstalledSensorNodeCount*8 ; b++)
+		for( b = 0 ; b < InstalledSensorNodeCount*16 ; b++)
 		{
 			SENSOR_MAP[b].NODE_ID = 0 ;
-			SENSOR_MAP[b].CH = b%8 ;
+			SENSOR_MAP[b].CH = b%16 ;
 			SENSOR_MAP[b].ID = 0 ;
 			SENSOR_MAP[b].ARG = 0 ;
 			SENSOR_MAP[b].INIT_TIME = 0 ;
@@ -158,10 +165,10 @@ int ReadDevice_Config(void)
 			SENSOR_MAP[b].COUNT=SensorInterval;
 		}
 
-		for( b = 0 ; b < InstalledActuatorNodeCount*8 ; b++)
+		for( b = 0 ; b < InstalledActuatorNodeCount*16 ; b++)
 		{
 			ACTUATOR_MAP[b].NODE_ID = 0 ;
-			ACTUATOR_MAP[b].CH = b%8 ;
+			ACTUATOR_MAP[b].CH = b%16 ;
 			ACTUATOR_MAP[b].ID = 0 ;
 			ACTUATOR_MAP[b].ARG = 0 ;
 			ACTUATOR_MAP[b].INIT_TIME = 0 ;
@@ -175,59 +182,60 @@ int ReadDevice_Config(void)
 
 	for( b= 0 ; b < InstalledSensorNodeCount ; b++)
 	{
-		for( i= 0 ; i < 8 ; i++) // ������ ä���� 8��
+		for( i= 0 ; i < 16 ; i++) // ������ ä���� 8��
 		{
-			SENSOR_MAP[b*8+i].NODE_ID = b;
+			SENSOR_MAP[b*16+i].NODE_ID = b;
 			sprintf( sbuf , "SENSOR_NODE_%d:NODETYPE",b ) ;
 			typedata = iniparser_getint( ini, sbuf , -1 ) ;
-			SENSOR_MAP[b*8+i].TYPE = typedata ;
+			SENSOR_MAP[b*16+i].TYPE = typedata ;
 
 			sprintf( sbuf , "SENSOR_NODE_%d:CANID",b ) ;
 			s = iniparser_getstring(ini, sbuf, NULL);
 		  	if( s != NULL ) {
 				strcpy( gbuf,s ) ;
-				SENSOR_MAP[b*8+i].CANID = (int)strtol(gbuf, NULL, 0);
+				SENSOR_MAP[b*16+i].CANID = (int)strtol(gbuf, NULL, 0);
 
 			}	else 
-				SENSOR_MAP[b*8+i].CANID = 0x0fff ;
+				SENSOR_MAP[b*16+i].CANID = 0x0fff ;
 
-			printf(" NODE %d CANID %x\n", b, SENSOR_MAP[b*8+i].CANID ) ;
+			printf(" SNODE %d CANID %x\n", b, SENSOR_MAP[b*16+i].CANID ) ;
 
 			if( typedata == 1 ) // ADC
 			{
-				SENSOR_MAP[b*8+i].SET_INTERVAL=SensorInterval ;
-				SENSOR_MAP[b*8+i].COUNT=SensorInterval;
+				SENSOR_MAP[b*16+i].SET_INTERVAL=SensorInterval ;
+				SENSOR_MAP[b*16+i].COUNT=SensorInterval;
 			}
 			else if( typedata == 2 ) // ISO
 			{
-				SENSOR_MAP[b*8+i].SET_INTERVAL=ISOInterval ;
-				SENSOR_MAP[b*8+i].COUNT=ISOInterval;
+				SENSOR_MAP[b*16+i].SET_INTERVAL=ISOInterval ;
+				SENSOR_MAP[b*16+i].COUNT=ISOInterval;
 			}
 			else if( typedata == 3 ) // COUNTER
 			{
-				SENSOR_MAP[b*8+i].SET_INTERVAL=SensorInterval ;
-				SENSOR_MAP[b*8+i].COUNT=SensorInterval;
+				SENSOR_MAP[b*16+i].SET_INTERVAL=SensorInterval ;
+				SENSOR_MAP[b*16+i].COUNT=SensorInterval;
 			}
 
 			sprintf( sbuf , "SENSOR_NODE_%d:CH%02d_ID",b,i ) ;
 			gdata = iniparser_getint( ini, sbuf , -1 ) ;
+			
 			if( gdata == -1 ) {
-				SI[b*8+i].data.id = SENSOR_MAP[b*8+i].ID = 255;
+				SI[b*16+i].data.id = SENSOR_MAP[b*16+i].ID = 255;
 			} else {
-				SI[b*8+i].data.id = SENSOR_MAP[b*8+i].ID = gdata ;
-				SI[b*8+i].mode=REQCMD_ACTIVE_MODE;
+				SI[b*16+i].data.id = SENSOR_MAP[b*16+i].ID = gdata ;
+				SI[b*16+i].mode=REQCMD_ACTIVE_MODE;
 			}
 
 			if( typedata == 10 ) // COMMUNICATION PORT SENSOR ( RS232,485 )
 			{
-				printf ("comm sensor [%d, %d, %d]\n", b, i + 1, SI[b*8+i].data.id);
-				SENSOR_MAP[b*8+i].SET_INTERVAL=SensorInterval ;
-				SENSOR_MAP[b*8+i].COUNT=SensorInterval;
+				printf ("comm sensor [%d, %d, %d]\n", b, i + 1, SI[b*16+i].data.id);
+				SENSOR_MAP[b*16+i].SET_INTERVAL=SensorInterval ;
+				SENSOR_MAP[b*16+i].COUNT=SensorInterval;
 
 				if(i > 0) {
-                    if (SI[b*8+i].data.id == 255)
+                    if (SI[b*16+i].data.id == 255)
 						break;
-					COMM_SENSOR[SENSOR_MAP[b*8].ARG].SENSOR_CNT= i + 1;
+					COMM_SENSOR[SENSOR_MAP[b*16].ARG].SENSOR_CNT= i + 1;
 					printf ("comm sensor [%d]\n", i + 1);
 				} else {
 					if (INSTALL_COMM_SENSOR_COUNT <= MAX_COMM_SENSOR )  {
@@ -238,94 +246,94 @@ int ReadDevice_Config(void)
 					}
 					printf ("INSTALL_COMM_SENSOR_COUNT [%d]\n", INSTALL_COMM_SENSOR_COUNT);
 
-					SENSOR_MAP[b*8+i].ARG =	INSTALL_COMM_SENSOR_COUNT - 1;
+					SENSOR_MAP[b*16+i].ARG =	INSTALL_COMM_SENSOR_COUNT - 1;
 
 					sprintf( sbuf , "SENSOR_NODE_%d:PORTID",b ) ;
 					typedata = iniparser_getint( ini, sbuf , INSTALL_COMM_SENSOR_COUNT ) ;
-					COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].PORT = typedata ;
+					COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].PORT = typedata ;
 
 					sprintf( sbuf , "SENSOR_NODE_%d:SPEED",b ) ;
 					typedata = iniparser_getint( ini, sbuf , -1 ) ;
-					COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].SPEED = typedata ;
+					COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].SPEED = typedata ;
 
 					sprintf( sbuf , "SENSOR_NODE_%d:LEN",b ) ;
 					typedata = iniparser_getint( ini, sbuf , -1 ) ;
-					COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].LEN = typedata ;
+					COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].LEN = typedata ;
 
 					sprintf( sbuf , "SENSOR_NODE_%d:EXP",b ) ;
 					s = iniparser_getstring(ini, sbuf, NULL);
 					if( s != NULL ) {
-						strcpy( COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].EXP,s ) ;
+						strcpy( COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].EXP,s ) ;
 					} else { 
-						strcpy( COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].EXP,"[[:digit:]]+" ) ;
+						strcpy( COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].EXP,"[[:digit:]]+" ) ;
 					}
 
 					sprintf( sbuf , "SENSOR_NODE_%d:TTY",b ) ;
 					s = iniparser_getstring(ini, sbuf, NULL);
 					if( s != NULL ) {
-						strcpy( COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].TTY,s ) ;
+						strcpy( COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].TTY,s ) ;
 					} else {
-						strcpy( COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].TTY,"/dev/ttyS0" ) ;
+						strcpy( COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].TTY,"/dev/ttyS0" ) ;
 					}
 
 					sprintf( sbuf , "SENSOR_NODE_%d:ENCODE",b ) ;
 					typedata = iniparser_getint( ini, sbuf , 1 ) ;
-					COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].ENCODE = typedata ;
+					COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].ENCODE = typedata ;
 
-					COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].SENSOR_NODE=b;
-					COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].SENSOR_CNT=1;
+					COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].SENSOR_NODE=b;
+					COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].SENSOR_CNT=1;
 
 					printf("COMM PORT SENSOR INSTALLED INFO [%d] ------------- \n PORT = %d, TTY = %s \n SPEED= %d\n LEN=%d\n EXP=%s,ENCODE=%d\n",
-							SENSOR_MAP[b*8+i].ARG,
-							COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].PORT,
-							COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].TTY,
-							COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].SPEED,
-							COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].LEN,
-							COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].EXP,
-							COMM_SENSOR[SENSOR_MAP[b*8+i].ARG].ENCODE
+							SENSOR_MAP[b*16+i].ARG,
+							COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].PORT,
+							COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].TTY,
+							COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].SPEED,
+							COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].LEN,
+							COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].EXP,
+							COMM_SENSOR[SENSOR_MAP[b*16+i].ARG].ENCODE
 
 					) ;
 				}
 			}
 
-			//printf("%s:%d\n",sbuf,SENSOR_MAP[b*8+i].ID  ) ;
+			//printf("%s:%d\n",sbuf,SENSOR_MAP[b*16+i].ID  ) ;
 		}
 	}
 
 	for( b= 0 ; b < InstalledActuatorNodeCount ; b++)
 	{
-		for( i= 0 ; i < 8 ; i++) // ������ ä���� 8��
+		for( i= 0 ; i < 16 ; i++) // ������ ä���� 8��
 		{
-			ACTUATOR_MAP[b*8+i].NODE_ID = b;
+			ACTUATOR_MAP[b*16+i].NODE_ID = b;
 
 			sprintf( sbuf , "ACTUATOR_NODE_%d:CANID",b ) ;
 			s = iniparser_getstring(ini, sbuf, NULL);
-			ACTUATOR_MAP[b*8+i].TYPE = 5 ;
+			ACTUATOR_MAP[b*16+i].TYPE = 5 ;
 			if( s != NULL )
 			{
 			strcpy( gbuf,s ) ;
-			ACTUATOR_MAP[b*8+i].CANID = (int)strtol(gbuf, NULL, 0);
+			ACTUATOR_MAP[b*16+i].CANID = (int)strtol(gbuf, NULL, 0);
 
-			} else ACTUATOR_MAP[b*8+i].CANID = 0xfff;
-			printf(" NODE %d CANID %x\n", b, ACTUATOR_MAP[b*8+i].CANID) ;
+			} else ACTUATOR_MAP[b*16+i].CANID = 0xfff;
+			printf(" ANODE %d CANID %x\n", b, ACTUATOR_MAP[b*16+i].CANID) ;
 
 
 			sprintf( sbuf , "ACTUATOR_NODE_%d:CH%02d_ID",b,i ) ;
 			gdata = iniparser_getint( ini, sbuf , -1 ) ;
 
 			if( gdata == -1 )
-			AI[b*8+i].data.id = ACTUATOR_MAP[b*8+i].ID = 255 ;
+			AI[b*16+i].data.id = ACTUATOR_MAP[b*16+i].ID = 255 ;
 			else
-			AI[b*8+i].data.id = ACTUATOR_MAP[b*8+i].ID = gdata ;
+			AI[b*16+i].data.id = ACTUATOR_MAP[b*16+i].ID = gdata ;
 
 			sprintf( sbuf , "ACTUATOR_NODE_%d:CH%02d_ARG",b,i ) ;
-			ACTUATOR_MAP[b*8+i].ARG = iniparser_getint( ini, sbuf , 0 ) ;
+			ACTUATOR_MAP[b*16+i].ARG = iniparser_getint( ini, sbuf , 0 ) ;
 
 			sprintf( sbuf , "ACTUATOR_NODE_%d:CH%02d_INIT",b,i ) ;
-			ACTUATOR_MAP[b*8+i].INIT_TIME = iniparser_getint( ini, sbuf , 0 ) ;
+			ACTUATOR_MAP[b*16+i].INIT_TIME = iniparser_getint( ini, sbuf , 0 ) ;
 
 			sprintf( sbuf , "ACTUATOR_NODE_%d:CH%02d_MAXTIME",b,i ) ;
-			ACTUATOR_MAP[b*8+i].SET_INTERVAL = iniparser_getint( ini, sbuf , 0 ) ;
+			ACTUATOR_MAP[b*16+i].SET_INTERVAL = iniparser_getint( ini, sbuf , 0 ) ;
 
 		}
 	}
@@ -370,23 +378,30 @@ int ReadServer_Config(void)
 //		char             sbuf[128] ;
 //		char						*sCH ;
 
-
-    ini = iniparser_load((char*)"../conf/cflora-server.ini");
-    //ini = iniparser_load((char*)"../../conf/cflora-server.ini");
-		//ini = iniparser_load((char*)"cflora-server.ini");
+/*
+    ini = iniparser_load((char*)"/home/pi/cflora/software/conf/cflora-server.ini");
     if (ini==NULL) {
-        fprintf(stderr, "cannot parse file: cflora-server.ini\n");
+        fprintf(stderr, "cannot parse file: /home/pi/cflora/software/conf/cflora-server.ini\n");
         return -1 ;
     }
+*/
+	//ini = iniparser_load((char*)"../../conf/cflora-server.ini");	
+	ini = iniparser_load((char*)"./cflora-server.ini");	
+	if (ini==NULL) {
+        fprintf(stderr, "cannot parse file: ../../conf/cflora-server.ini\n");
+        return -1 ;
+    }
+
   //  iniparser_dump(ini, stderr);
 
-		s = iniparser_getstring(ini, "GCG:IP", NULL);
+		s = iniparser_getstring(ini, "GCG-1:IP", NULL);
 		//memset( GCG_IP,0x00,128 ) ;
 		strcpy( GCG_IP,s ) ;
-		GCG_PORT = iniparser_getint(ini, "GCG:PORT", 5000);
+		GCG_PORT = iniparser_getint(ini, "GCG-1:PORT", 5000);
 
 		printf("GCG INFO %s : %d\n",GCG_IP,GCG_PORT ) ;
-    iniparser_freedict(ini);
+   
+	iniparser_freedict(ini);
     return 0 ;
 }
 
@@ -394,7 +409,7 @@ int ReadServer_Config(void)
 int GetSensorConfigIndex( char getID )
 {
 		int b;
-		for( b = 0 ; b < InstalledSensorNodeCount*8 ; b++)
+		for( b = 0 ; b < InstalledSensorNodeCount*16 ; b++)
 		{
 			if( SENSOR_MAP[b].ID == getID ) return b ;
 		}
@@ -406,7 +421,7 @@ int GetSensorConfigIndex( char getID )
 int GetActuatorConfigIndex( char getID ,BYTE arg )
 {
 		int b;
-		for( b = 0 ; b < InstalledActuatorNodeCount*8 ; b++)
+		for( b = 0 ; b < InstalledActuatorNodeCount*16 ; b++)
 		{
 			if( ACTUATOR_MAP[b].ID == getID && ACTUATOR_MAP[b].ARG == arg ) return b ;
 		}

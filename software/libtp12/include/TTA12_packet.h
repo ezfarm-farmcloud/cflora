@@ -89,12 +89,12 @@ public:
 	
 	TTA12Packet TTAPacket;
 
-	SensorInfo siData[8] ;
-  ActuatorInfo aiData[8] ; 
+	SensorInfo siData[MAXNODE_CHANNEL] ;
+    ActuatorInfo aiData[MAXNODE_CHANNEL] ; 
 	
-	SensorValue sData[8];
-	ActuatorValue aData[8];	
-  char aDataARG[8] ;
+	SensorValue sData[MAXNODE_CHANNEL];
+	ActuatorValue aData[MAXNODE_CHANNEL];	
+	char aDataARG[8] ;
 public :
 		
 	TTA12PacketParsing(void ) ;

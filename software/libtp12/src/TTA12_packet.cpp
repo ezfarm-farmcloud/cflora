@@ -481,15 +481,15 @@ TTA12PacketParsing::~TTA12PacketParsing()
 
 SensorInfo TTA12PacketParsing::GetSensorInfo(  WORD node,WORD sensor_id) // sensor_id 0~7  노드당 최대 센서 8개 
 {
-	if( sensor_id < 8 )
-		return SI[node*8+sensor_id] ; 
+	if( sensor_id < 16 )
+		return SI[node*16+sensor_id] ; 
 	else
 		return SI[node] ; // default 0번 return by chj 
 }
 
 ActuatorInfo TTA12PacketParsing::GetActuatorInfo( WORD node,WORD actuator_id ) // actuator_id 0~7  노드당 최대 엑추에이터 8개 
 {
-	return AI[node*8+actuator_id] ; 
+	return AI[node*16+actuator_id] ; 
 }
 
 

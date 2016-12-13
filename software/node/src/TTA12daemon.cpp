@@ -109,16 +109,17 @@ int ACTUATOR_NODE_CONTROL( int node, int mode, u8 ch,u8 set )
 
 	COMMPACKET Packet ;
 
-  u8 outSETMASK=0x00;
-  u8 outRESETMASK=0xFF;
+   u16 outSETMASK=0x0000;
+   u16 outRESETMASK=0xFFFF;
 
-	Packet.wCanID = ACTUATOR_MAP[node*8+ch].CANID  ;
+	Packet.wCanID = ACTUATOR_MAP[node*16+ch].CANID  ;
 
-	memset( Packet.nData , 0 , 8 ) ;
+	//memset( Packet.wData , 0 , 16 ) ;
+	
 	if( mode == REQCMD_INIT || mode == REQCMD_INIT_NODE || mode == REQCMD_INIT_ACT ) // �ʱ�ȭ
 	{
-			Packet.nData[0]= outSETMASK ;
-			Packet.nData[1]= outRESETMASK ;
+			Packet.wData[0]= outSETMASK ;
+			Packet.wData[1]= outRESETMASK ;
 	}
 	if( mode == REQCMD_ACTUATOR_SET ) // ���������� ����
 	{
@@ -131,14 +132,14 @@ int ACTUATOR_NODE_CONTROL( int node, int mode, u8 ch,u8 set )
 			outRESETMASK = 0x01 << ch  ;
 		}
 
-			Packet.nData[0]= outSETMASK ;
-			Packet.nData[1]= outRESETMASK ;
+			Packet.wData[0]= outSETMASK ;
+			Packet.wData[1]= outRESETMASK ;
 	}
 
 	printf( "ACTUATOR SET CAN_ID[%04X]--- ON[%04X] OFF[%04x]\n",
 		Packet.wCanID ,
-		Packet.nData[0],
-		Packet.nData[1]
+		Packet.wData[0],
+		Packet.wData[1]
 	) ;
 
 	USART_SendPacket( COMM_SENSOR[0].PORT,&Packet ) ;
@@ -152,10 +153,10 @@ int ACTUATOR_NODE_CONTROL( int node, int mode, u8 ch,u8 set )
 //
 int TransOnStatusActuatorData( char mode )
 {
-	ActuatorValue NodeActData[64] ;
+	ActuatorValue NodeActData[16*8] ;
 	int NodeDataCount=0;
 	int scount=0;
-	ActuatorValue GetActData[8] ;
+	ActuatorValue GetActData[16*8] ;// at debug mode
 
 	BYTE ncnt=0;
 	BYTE cnt=0 ;
@@ -176,29 +177,29 @@ int TransOnStatusActuatorData( char mode )
 		TTAPacket.MakePayload() ;
 		NodeDataCount=0;
 
-		for( cnt=0; cnt < 8 ;cnt++)
+		for( cnt=0; cnt < 16 ;cnt++)
 		{
-//			if ( AI[ncnt*8+cnt].data.value != 0 ) {
+//			if ( AI[ncnt*16+cnt].data.value != 0 ) {
 
 			//printf(" id=%d,%d aData[%d].value =  %d \n",TTAParser.aData[i].id,TTAParser.aData[i].type,i,TTAParser.aData[i].value ) ;
-			if( AI[ncnt*8+cnt].state == mode &&  AI[ncnt*8+cnt].data.id < 255 )
+			if( AI[ncnt*16+cnt].state == mode &&  AI[ncnt*16+cnt].data.id < 255 )
 			{
 
-				NodeActData[NodeDataCount].id = AI[ncnt*8+cnt].data.id ;
-				NodeActData[NodeDataCount].type = AI[ncnt*8+cnt].data.type  ;
-				//NodeActData[NodeDataCount].value = AI[ncnt*8+cnt].data.value | ( ACTUATOR_MAP[ncnt*8+cnt].ARG<<12 ) ;
-				NodeActData[NodeDataCount].value = ACTUATOR_MAP[ncnt*8+cnt].COUNT | ( ACTUATOR_MAP[ncnt*8+cnt].ARG<<12 ) ;
+				NodeActData[NodeDataCount].id = AI[ncnt*16+cnt].data.id ;
+				NodeActData[NodeDataCount].type = AI[ncnt*16+cnt].data.type  ;
+				//NodeActData[NodeDataCount].value = AI[ncnt*16+cnt].data.value | ( ACTUATOR_MAP[ncnt*16+cnt].ARG<<12 ) ;
+				NodeActData[NodeDataCount].value = ACTUATOR_MAP[ncnt*16+cnt].COUNT | ( ACTUATOR_MAP[ncnt*16+cnt].ARG<<12 ) ;
 
 				//ACTUATOR_MAP[b*8+i].ARG
 				if( mode == 0x04 )
 				{
-					if( AI[ncnt*8+cnt].data.value == 0 )
+					if( AI[ncnt*16+cnt].data.value == 0 )
 					{
 						printf("NODE: %d Add OFF ACT %d %d %d ARG=%d\n",ncnt ,
 								NodeActData[NodeDataCount].id,
 								NodeActData[NodeDataCount].type,
 								NodeActData[NodeDataCount].value,
-							ACTUATOR_MAP[ncnt*8+cnt].ARG
+							ACTUATOR_MAP[ncnt*16+cnt].ARG
 
 							) ;
 
@@ -207,7 +208,7 @@ int TransOnStatusActuatorData( char mode )
 								NodeActData[NodeDataCount].id,
 								NodeActData[NodeDataCount].type,
 								NodeActData[NodeDataCount].value,
-							ACTUATOR_MAP[ncnt*8+cnt].ARG
+							ACTUATOR_MAP[ncnt*16+cnt].ARG
 
 							) ;
 					}
@@ -216,13 +217,13 @@ int TransOnStatusActuatorData( char mode )
 								NodeActData[NodeDataCount].id,
 								NodeActData[NodeDataCount].type,
 								NodeActData[NodeDataCount].value,
-							ACTUATOR_MAP[ncnt*8+cnt].ARG
+							ACTUATOR_MAP[ncnt*16+cnt].ARG
 
 							) ;
 				}
 
 				if( NodeDataCount < 64 ) NodeDataCount++;
-				AI[ncnt*8+cnt].state=0x00 ;
+				AI[ncnt*16+cnt].state=0x00 ;
 			}
 //
 //			}
@@ -302,7 +303,7 @@ int TransPassiveModeSensorData( void )
 				NodeSensorData[cnt] = SI[getINDEX].data;
 				NodeSensorDataCount++;
 
-				SENSOR_MAP[TTAParser.NODE_ID*8+SI[cnt].data.id].SET_INTERVAL= 0x00 ; //
+				SENSOR_MAP[TTAParser.NODE_ID*16+SI[cnt].data.id].SET_INTERVAL= 0x00 ; //
 			}
 		}
 	}
@@ -323,9 +324,11 @@ int TransPassiveModeSensorData( void )
 //
 int TransActiveModeSensorData( char mode )
 {
-	SensorValue NodeSensorData[8] ;
+	SensorValue NodeSensorData[16] ;
 	int scount=0;
-	SensorValue GetSensorData[8] ;
+	SensorValue GetSensorData[16] ;
+	
+	
 	int NodeSensorDataCount=0;
 	int NODE_NUM=0;BYTE cnt=0 ;
 	TTA12Packet TTAPacket;
@@ -344,15 +347,15 @@ int TransActiveModeSensorData( char mode )
 		TTAPacket.MakeHeader() ;
 		TTAPacket.MakePayload() ;
 
-		for( cnt = 0 ; cnt < 8;cnt++)
+		for( cnt = 0 ; cnt < 16;cnt++)
 		{
-			if( SI[NODE_NUM*8+cnt].state == mode && SI[NODE_NUM*8+cnt].data.id < 255 )
+			if( SI[NODE_NUM*16+cnt].state == mode && SI[NODE_NUM*16+cnt].data.id < 255 )
 			{
 
-				NodeSensorData[NodeSensorDataCount].id = SI[NODE_NUM*8+cnt].data.id ;
-				NodeSensorData[NodeSensorDataCount].type = SI[NODE_NUM*8+cnt].data.type  ;
-				NodeSensorData[NodeSensorDataCount].value = SI[NODE_NUM*8+cnt].data.value  ;
-				if( SI[NODE_NUM*8+cnt].data.id == 50 )
+				NodeSensorData[NodeSensorDataCount].id = SI[NODE_NUM*16+cnt].data.id ;
+				NodeSensorData[NodeSensorDataCount].type = SI[NODE_NUM*16+cnt].data.type  ;
+				NodeSensorData[NodeSensorDataCount].value = SI[NODE_NUM*16+cnt].data.value  ;
+				if( SI[NODE_NUM*16+cnt].data.id == 50 )
 				{
 
 				printf("NODE: %d Add data %d %d %d \n",NODE_NUM ,
@@ -363,7 +366,7 @@ int TransActiveModeSensorData( char mode )
 
 				}
 				NodeSensorDataCount++;
-				SI[NODE_NUM*8+cnt].state=0x00 ;
+				SI[NODE_NUM*16+cnt].state=0x00 ;
 			}
 		}
 
@@ -551,16 +554,41 @@ void *Timer_handler(void * arg)
 			for( int bs = 0 ; bs < InstalledSensorNodeCount ;bs++)
 			{
 
-				if( SENSOR_MAP[bs*8].TYPE == 1 ) // AD BOARD
+				if( SENSOR_MAP[bs*16].TYPE == 1 ) // AD BOARD
 				{
-					Packet.wCanID = (SENSOR_MAP[bs*8].CANID&0x00FF)|0x0000 ;
+					Packet.wCanID = (SENSOR_MAP[bs*16].CANID&0x00FF)|0x0000 ;
 					memset( Packet.nData , 0 , 8 ) ;
 					Packet.nData[0]= 0x00;
 					Packet.nData[1]= 0xFF;
 
 					USART_SendPacket(COMM_SENSOR[0].PORT, &Packet ) ; usleep(1000*50) ;nodeDelay++;
 
-					Packet.wCanID = (SENSOR_MAP[bs*8].CANID&0x00FF)|0x0100 ;
+					Packet.wCanID = (SENSOR_MAP[bs*16].CANID&0x00FF)|0x0100 ;
+					memset( Packet.nData , 0 , 8 ) ;
+					Packet.nData[0]= 0x00;
+					Packet.nData[1]= 0xFF;
+
+					USART_SendPacket(COMM_SENSOR[0].PORT, &Packet ) ;usleep(1000*50) ;nodeDelay++;
+
+					Packet.wCanID = (SENSOR_MAP[bs*16].CANID&0x00FF)|0x0500 ;
+					memset( Packet.nData , 0 , 8 ) ;
+					Packet.nData[0]= 0x00;
+					Packet.nData[1]= 0xFF;
+
+					USART_SendPacket(COMM_SENSOR[0].PORT, &Packet ) ; usleep(1000*50) ;nodeDelay++;
+
+					Packet.wCanID = (SENSOR_MAP[bs*16].CANID&0x00FF)|0x0600 ;
+					memset( Packet.nData , 0 , 8 ) ;
+					Packet.nData[0]= 0x00;
+					Packet.nData[1]= 0xFF;
+
+					USART_SendPacket(COMM_SENSOR[0].PORT, &Packet ) ;usleep(1000*50) ;nodeDelay++;
+
+				}
+
+				if( SENSOR_MAP[bs*16].TYPE == 2 ) // ISO BOARD
+				{
+					Packet.wCanID = SENSOR_MAP[bs*16].CANID ;
 					memset( Packet.nData , 0 , 8 ) ;
 					Packet.nData[0]= 0x00;
 					Packet.nData[1]= 0xFF;
@@ -568,19 +596,9 @@ void *Timer_handler(void * arg)
 					USART_SendPacket(COMM_SENSOR[0].PORT, &Packet ) ;usleep(1000*50) ;nodeDelay++;
 				}
 
-				if( SENSOR_MAP[bs*8].TYPE == 2 ) // ISO BOARD
+				if( SENSOR_MAP[bs*16].TYPE == 3 ) // COUNTER BOARD
 				{
-					Packet.wCanID = SENSOR_MAP[bs*8].CANID ;
-					memset( Packet.nData , 0 , 8 ) ;
-					Packet.nData[0]= 0x00;
-					Packet.nData[1]= 0xFF;
-
-					USART_SendPacket(COMM_SENSOR[0].PORT, &Packet ) ;usleep(1000*50) ;nodeDelay++;
-				}
-
-				if( SENSOR_MAP[bs*8].TYPE == 3 ) // COUNTER BOARD
-				{
-					Packet.wCanID = SENSOR_MAP[bs*8].CANID ;
+					Packet.wCanID = SENSOR_MAP[bs*16].CANID ;
 					memset( Packet.nData , 0 , 8 ) ;
 					Packet.nData[0]= 0x00;
 					Packet.nData[1]= 0xFF;
@@ -636,10 +654,10 @@ void *RS232_Thread(void * arg)
 void InitializeActuatorOffAtStartup(void)
 {
 		int i=0;
-		for( i=0; i < InstalledActuatorNodeCount*8 ;i++)
+		for( i=0; i < InstalledActuatorNodeCount*16 ;i++)
 		{
 
-				printf(" ACTUATOR INIT OFF NODE_ID=%d,ID=%d,CH=%d,INIT TIME=%d\n",
+				printf(">> ACTUATOR INIT OFF NODE_ID=%d,ID=%d,CH=%d,INIT TIME=%d\n",
 					ACTUATOR_MAP[i].NODE_ID,
 					ACTUATOR_MAP[i].ID,
 					ACTUATOR_MAP[i].CH,
@@ -648,8 +666,10 @@ void InitializeActuatorOffAtStartup(void)
 				AI[i].data.id = ACTUATOR_MAP[i].ID ;
 				//AI[i].data.value = ACTUATOR_MAP[i].INIT_TIME ;
 				//ACTUATOR_MAP[	i ].COUNT= ActuatorInterval ;
+				
 				ACTUATOR_NODE_CONTROL( ACTUATOR_MAP[i].NODE_ID , REQCMD_ACTUATOR_SET,ACTUATOR_MAP[i].CH, 0 ) ;
-
+				
+				
 /*
 			if( ACTUATOR_MAP[i].INIT_TIME > 0 )
 			{
@@ -852,7 +872,7 @@ BYTE SearchIndexSensorNode( WORD CANID )
 	BYTE b=0;
 	for( b= 0 ; b < InstalledSensorNodeCount ; b++ )
 	{
-			if( (SENSOR_MAP[b*8].CANID&0x00ff) == (CANID&0x00ff) ) return b ;
+			if( (SENSOR_MAP[b*16].CANID&0x00ff) == (CANID&0x00ff) ) return b ;
 	}
   return InstalledSensorNodeCount-1 ;
 }
@@ -929,61 +949,6 @@ void SensorValueReadToNode (void)
 
 		if( NodeTYPE == 0x00 ) // BASE board �ܵ�����������
 		{
-			if( DataTYPE ==0x00 )   // ADC ����ä��
-			{
-				//NodeID = 0 ;
-				SI[NodeID*8+0].data.value = USARTStreamingBuffer[0].wData[0] ;
-				SI[NodeID*8+1].data.value = USARTStreamingBuffer[0].wData[1] ;
-				SI[NodeID*8+2].data.value = USARTStreamingBuffer[0].wData[2] ;
-				SI[NodeID*8+3].data.value = USARTStreamingBuffer[0].wData[3] ;
-
-				printf( "BASE ADC[%d] 1,2,3,4 %4d %4d %4d %4d\n",
-					NodeID,
-				  SI[NodeID*8+0].data.value ,
-					SI[NodeID*8+1].data.value ,
-					SI[NodeID*8+2].data.value ,
-					SI[NodeID*8+3].data.value  ) ;
-
-			}
-			if( DataTYPE ==0x01 )  // ADC ����ä��
-			{
-				//NodeID = 0 ;
-				SI[NodeID*8+4].data.value = USARTStreamingBuffer[0].wData[0] ;
-				SI[NodeID*8+5].data.value = USARTStreamingBuffer[0].wData[1] ;
-				SI[NodeID*8+6].data.value = USARTStreamingBuffer[0].wData[2] ;
-				SI[NodeID*8+7].data.value = USARTStreamingBuffer[0].wData[3] ;
-
-				printf( "BASE ADC[%d] 5,6,7,8 %4d %4d %4d %4d\n",
-					NodeID,
-					SI[NodeID*8+4].data.value ,
-					SI[NodeID*8+5].data.value ,
-					SI[NodeID*8+6].data.value ,
-					SI[NodeID*8+7].data.value  ) ;
-
-			}
-
-
-			if( DataTYPE ==0x03 ) // ISO �Է�
-			{
-				//NodeID = 1 ;
-				BYTE bitVAL=0x01;
-				printf( "BASE ISO IN %02X\n",
-					USARTStreamingBuffer[0].nData[0] ) ;
-				for( char i = 0 ; i < 8 ;i ++)
-				{
-					if( (USARTStreamingBuffer[0].nData[0]&bitVAL)==bitVAL )
-						SI[NodeID*8+i].data.value=0xFFFF;
-					else
-						SI[NodeID*8+i].data.value=0x0000;
-					bitVAL<<=1;
-
-					printf( "ISO IN CH %d:%02X\n",i, SI[NodeID*8+i].data.value ) ;
-				}
-
-
-
-			}
-
 			if( DataTYPE ==0x04 ) // COUNTER �Է�
 			{
 				//NodeID = 2 ;
@@ -991,46 +956,78 @@ void SensorValueReadToNode (void)
 											USARTStreamingBuffer[0].wCanID,
 						SearchIndexSensorNode(USARTStreamingBuffer[0].wCanID),
 					USARTStreamingBuffer[0].dwData[0],USARTStreamingBuffer[0].dwData[1] ) ;
-				SI[NodeID*8+0].data.value=USARTStreamingBuffer[0].dwData[0];
-				SI[NodeID*8+1].data.value=USARTStreamingBuffer[0].dwData[1];
+				SI[NodeID*16+0].data.value=USARTStreamingBuffer[0].dwData[0];
+				SI[NodeID*16+1].data.value=USARTStreamingBuffer[0].dwData[1];
 			}
 
-		} else {  // Extend board
+		} else {  // ADC,ISO,RELAY MODULE board
 
 			if( NodeTYPE ==0x10 )   // ADC
 			{
 				if( DataTYPE ==0x00 )   // ADC ����ä��
 				{
 
-					SI[NodeID*8+0].data.value = USARTStreamingBuffer[0].wData[0] ;
-					SI[NodeID*8+1].data.value = USARTStreamingBuffer[0].wData[1] ;
-					SI[NodeID*8+2].data.value = USARTStreamingBuffer[0].wData[2] ;
-					SI[NodeID*8+3].data.value = USARTStreamingBuffer[0].wData[3] ;
+					SI[NodeID*16+0].data.value = USARTStreamingBuffer[0].wData[0] ;
+					SI[NodeID*16+1].data.value = USARTStreamingBuffer[0].wData[1] ;
+					SI[NodeID*16+2].data.value = USARTStreamingBuffer[0].wData[2] ;
+					SI[NodeID*16+3].data.value = USARTStreamingBuffer[0].wData[3] ;
 
 					printf( "ADC[%04x : %d] 1,2,3,4 %4d %4d %4d %4d\n",
 						USARTStreamingBuffer[0].wCanID,
 						SearchIndexSensorNode(USARTStreamingBuffer[0].wCanID),
-						SI[NodeID*8+0].data.value ,
-						SI[NodeID*8+1].data.value ,
-						SI[NodeID*8+2].data.value ,
-						SI[NodeID*8+3].data.value  ) ;
+						SI[NodeID*16+0].data.value ,
+						SI[NodeID*16+1].data.value ,
+						SI[NodeID*16+2].data.value ,
+						SI[NodeID*16+3].data.value  ) ;
 
 				}
 				if( DataTYPE ==0x01 )  // ADC ����ä��
 				{
 
-					SI[NodeID*8+4].data.value = USARTStreamingBuffer[0].wData[0] ;
-					SI[NodeID*8+5].data.value = USARTStreamingBuffer[0].wData[1] ;
-					SI[NodeID*8+6].data.value = USARTStreamingBuffer[0].wData[2] ;
-					SI[NodeID*8+7].data.value = USARTStreamingBuffer[0].wData[3] ;
+					SI[NodeID*16+4].data.value = USARTStreamingBuffer[0].wData[0] ;
+					SI[NodeID*16+5].data.value = USARTStreamingBuffer[0].wData[1] ;
+					SI[NodeID*16+6].data.value = USARTStreamingBuffer[0].wData[2] ;
+					SI[NodeID*16+7].data.value = USARTStreamingBuffer[0].wData[3] ;
 
 					printf( "ADC[%04x : %d] 5,6,7,8 %4d %4d %4d %4d\n",
 						USARTStreamingBuffer[0].wCanID,
 						SearchIndexSensorNode(USARTStreamingBuffer[0].wCanID),
-						SI[NodeID*8+4].data.value ,
-						SI[NodeID*8+5].data.value ,
-						SI[NodeID*8+6].data.value ,
-						SI[NodeID*8+7].data.value  ) ;
+						SI[NodeID*16+4].data.value ,
+						SI[NodeID*16+5].data.value ,
+						SI[NodeID*16+6].data.value ,
+						SI[NodeID*16+7].data.value  ) ;
+
+				}
+				if( DataTYPE ==0x05 )   // ADC ����ä��
+				{
+					//NodeID = 0 ;
+					SI[NodeID*16+8].data.value = USARTStreamingBuffer[0].wData[0] ;
+					SI[NodeID*16+9].data.value = USARTStreamingBuffer[0].wData[1] ;
+					SI[NodeID*16+10].data.value = USARTStreamingBuffer[0].wData[2] ;
+					SI[NodeID*16+11].data.value = USARTStreamingBuffer[0].wData[3] ;
+
+					printf( "BASE ADC[%d] 9,10,11,12 %4d %4d %4d %4d\n",
+						NodeID,
+					  SI[NodeID*16+8].data.value ,
+						SI[NodeID*16+9].data.value ,
+						SI[NodeID*16+10].data.value ,
+						SI[NodeID*16+11].data.value  ) ;
+
+				}
+				if( DataTYPE ==0x06 )  // ADC ����ä��
+				{
+					//NodeID = 0 ;
+					SI[NodeID*16+12].data.value = USARTStreamingBuffer[0].wData[0] ;
+					SI[NodeID*16+13].data.value = USARTStreamingBuffer[0].wData[1] ;
+					SI[NodeID*16+14].data.value = USARTStreamingBuffer[0].wData[2] ;
+					SI[NodeID*16+15].data.value = USARTStreamingBuffer[0].wData[3] ;
+
+					printf( "BASE ADC[%d] 13,14,15,16 %4d %4d %4d %4d\n",
+						NodeID,
+						SI[NodeID*16+12].data.value ,
+						SI[NodeID*16+13].data.value ,
+						SI[NodeID*16+14].data.value ,
+						SI[NodeID*16+15].data.value  ) ;
 
 				}
 			}
@@ -1038,36 +1035,25 @@ void SensorValueReadToNode (void)
 
 			if( NodeTYPE ==0x30 && DataTYPE ==0x03 ) // ISO �Է�
 			{
-				BYTE bitVAL=0x01;
+				WORD bitVAL=0x01;
 				printf( "ISO [%04x : %d] IN %02X\n",
 						USARTStreamingBuffer[0].wCanID,
 						SearchIndexSensorNode(USARTStreamingBuffer[0].wCanID),
 					USARTStreamingBuffer[0].nData[0] ) ;
 
-				for( char i = 0 ; i < 8 ;i ++)
+				for( char i = 0 ; i < 16 ;i ++)
 				{
-					if( (USARTStreamingBuffer[0].nData[0]&bitVAL)==bitVAL )
-						SI[NodeID*8+i].data.value=0xFFFF;
+					if( (USARTStreamingBuffer[0].wData[0]&bitVAL)==bitVAL )
+						SI[NodeID*16+i].data.value=0xFFFF;
 					else
-						SI[NodeID*8+i].data.value=0x0000;
+						SI[NodeID*16+i].data.value=0x0000;
 					bitVAL<<=1;
 
-					printf( "ISO IN CH %d:%02X\n",i, SI[NodeID*8+i].data.value ) ;
+					printf( "ISO IN CH %d:%02X\n",i, SI[NodeID*16+i].data.value ) ;
 				}
 
 			}
 
-			if( NodeTYPE ==0x40 && DataTYPE ==0x04 ) // COUNTER �Է�
-			{
-
-				printf( "COUNTER  [%04x : %d] IN CH1 %d,CH2 %d\n",
-											USARTStreamingBuffer[0].wCanID,
-						SearchIndexSensorNode(USARTStreamingBuffer[0].wCanID),
-					USARTStreamingBuffer[0].dwData[0],USARTStreamingBuffer[0].dwData[1] ) ;
-				SI[NodeID*8+0].data.value=USARTStreamingBuffer[0].dwData[0];
-				SI[NodeID*8+1].data.value=USARTStreamingBuffer[0].dwData[1];
-
-			}
 		}
 
 		if( SensorReadCount < 20 ) SensorReadCount++ ;
@@ -1125,6 +1111,9 @@ void sig_handler(int signo)
 	printf("Program Exit \n") ;
 	exit(signo) ;
 }
+
+
+
 int main(int argc, char **argv)
 {
 	bool rtn;
@@ -1152,15 +1141,17 @@ int main(int argc, char **argv)
 	//
 	PacketVariable_init() ;
 
-  ReadDevice_Config() ;
-  ReadServer_Config() ;
+	ReadDevice_Config() ;printf("Config device read OK!!\n") ;
+	ReadServer_Config() ;printf("Config server read OK!!\n") ;
+
+	
 
 	//////////////////////////////////////////////////////////////////////////
 	//
 	// ���� �ʱ�ȭ
 	//
 	pthread_mutex_init(&mutex_key, NULL);
-	pthread_mutex_init(&mutex_rsbuf[0], NULL);
+	//pthread_mutex_init(&mutex_rsbuf[0], NULL);
 	pthread_mutex_init(&mutex_process, NULL);
 
 
@@ -1179,16 +1170,19 @@ int main(int argc, char **argv)
 //	}
 
 	for (idx = 0; idx < INSTALL_COMM_SENSOR_COUNT; idx++) {
-    		pthread_mutex_init(&mutex_rsbuf[idx], NULL);
+    		
+		pthread_mutex_init(&mutex_rsbuf[idx], NULL);
 		printf("Serial port #[%d] open for COMM %s %d\n", idx+1, COMM_SENSOR[idx].TTY, COMM_SENSOR[idx].SPEED) ;
 		if( RS232_OpenComport(COMM_SENSOR[idx].PORT, COMM_SENSOR[idx].TTY, COMM_SENSOR[idx].SPEED) )
 		{
 			printf("Can not open serial port #[%d] for COMM SENSOR (RS485)\n", idx+1) ;
-		}
+			COMM_SENSOR[idx].SPEED=0;
+		} 
+		
 		memset(USARTRxbuf + idx, 0, 10) ;
 	}
 
-  	RS485Ctrl_flow(0) ;  // receive mode
+  	//RS485Ctrl_flow(0) ;  // receive mode
 
 	pthread_create(&t_idRS232, NULL, RS232_Thread, NULL) ;
 	pthread_detach(t_idRS232) ;
@@ -1215,13 +1209,13 @@ int main(int argc, char **argv)
 		retry_count++ ;
 	}
 	printf("======================================\n") ;
-	printf("TTA1,2 daemon build 3.2001  2016-09-11  \n" ) ;
-	printf("NO Handshaek version ...    \n" ) ;
+	printf("TTA1,2 daemon build 3.2001  2016-12-07  \n" ) ;
+	printf("Raspberry support ...    \n" ) ;
 	printf("config.ini applied    \n" ) ;
 	printf("Initialize Actuator at Power ON   \n" ) ;
 	printf("======================================\n") ;
 
-	BuzzerBeep(); BuzzerBeep();
+	//BuzzerBeep(); BuzzerBeep();
 	sleep(1) ;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1271,8 +1265,11 @@ int main(int argc, char **argv)
 		}
 
     	for (idx = 1; idx <INSTALL_COMM_SENSOR_COUNT; idx++) {
-	        printf("comm sensor packet [%d] ................\n", idx) ;
-  			UARTSensorPacketStreaming(idx);
+	        if( COMM_SENSOR[idx].SPEED > 0 )
+			{
+				printf("comm sensor packet [%d] ................\n", idx) ;
+  				UARTSensorPacketStreaming(idx);
+			}
 		}
 
 
