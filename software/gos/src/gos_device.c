@@ -994,6 +994,7 @@ gos_load_convertinfo (gos_dev_t *pdev, cf_db_t *db) {
 /*
 static char *cmdstatstr[GOS_CMD_STATMAX] = {
 	"no command",
+	"ignored because of a wrong command",
 	"ignored by a new command",
 	"ignored by auto control policy",
 	"waiting",
@@ -1146,14 +1147,32 @@ gos_delete_control (gos_cmd_t *pcmd, cf_db_t *db) {
 	return CF_OK;
 }
 
+int
+gos_is_command_finished (gos_cmd_t *pcmd) {
+    if (pcmd->stat >= GOS_CMD_FINISHED_NORMALLY) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int
+gos_is_command_ignored (gos_cmd_t *pcmd) {
+    if (pcmd->stat == GOS_CMD_IGNORED_BY_NEWCOMMAND
+		|| pcmd->stat == GOS_CMD_IGNORED_BY_AUTOCONTROL
+		|| pcmd->stat == GOS_CMD_IGNORED_WRONGCOMMAND) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 cf_ret_t
 gos_update_command_status (gos_cmd_t *pcmd, gos_cmdstat_t stat, cf_db_t *db) {
 	pcmd->stat = stat;
 	if (gos_update_control (pcmd, db) == CF_OK) {
 		// 명령이 종료된 경우에는 업데이트후 완전 종료함.
-		if (stat >= GOS_CMD_FINISHED_NORMALLY 
-			|| stat == GOS_CMD_IGNORED_BY_NEWCOMMAND
-			|| stat == GOS_CMD_IGNORED_BY_AUTOCONTROL) {
+        if (gos_is_command_finished (pcmd) || gos_is_command_ignored (pcmd)) {
 
 			CF_VERBOSE (CF_VERBOSE_HIGH, "A command (%d) of an actuator (%d) finished with status (%d).", pcmd->id, pcmd->deviceid, pcmd->stat);
 
@@ -1209,6 +1228,16 @@ gos_update_waiting_command (gos_dev_t *pdev, gos_cmd_t *pcmd, cf_db_t *db) {
 	return pwaiting;
 }
 
+int
+gos_is_wrong_command (gos_cmd_t *pcmd) {
+    if (pcmd->tm < 0 || pcmd->tm > _GOS_ACTARG_TIMEFILTER)
+        return 1;
+    // 모터형과 스위치형이 구분이 안되서 완벽한 상태는 아님.
+    if (pcmd->arg != _GOS_MOTOR_ARG_OPEN || pcmd->arg != _GOS_MOTOR_ARG_CLOSE)
+        return 1;
+    return 0;
+}
+
 cf_ret_t
 gos_read_commands (gos_devinfo_t *pdevinfo, cf_db_t *db) {
 	char **result;
@@ -1239,6 +1268,12 @@ gos_read_commands (gos_devinfo_t *pdevinfo, cf_db_t *db) {
 	CF_VERBOSE (CF_VERBOSE_HIGH, "There are %d commands in the gos_control table.", rows);
 	for (i = 1; i <= rows; i++) {
 		gos_load_command_from_result (&cmd, result, i * columns);
+
+        // 잘못된 명령이라면 무시한다.
+        if (gos_is_wrong_command (&cmd)) {
+			gos_update_command_status (&cmd, GOS_CMD_IGNORED_WRONGCOMMAND, db);
+            continue;
+        }
 
 		// 정지명령이 있다면 해당 장비에 대한 이후의 명령을 패스한다.
 		if (cmd.deviceid == pass_deviceid)	

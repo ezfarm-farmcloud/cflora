@@ -70,17 +70,18 @@ typedef enum {
 #define _GOS_RESENT_IGNORE_COUNT	8
 
 typedef enum {
-	GOS_CMD_NONE = 0,				///> 명령이 없는 상태 (디비에는 있을 수 있음)
-	GOS_CMD_IGNORED_BY_NEWCOMMAND,	///> 명령이 새로운 명령으로 무시된 상태
-	GOS_CMD_IGNORED_BY_AUTOCONTROL,	///> 명령이 수동 명령이라 자동동작상태에서는 무시된 상태
-	GOS_CMD_WAITING,				///> 명령이 대기중인 상태
-	GOS_CMD_SENT,					///> 명령이 전송된 상태
-	GOS_CMD_WORKING,				///> 명령이 작동중인 상태
-	GOS_CMD_STOPPING_BY_ASENSOR,	///> 명령이 리미터에 의해 중지 예정인 상태
-	GOS_CMD_STOPPING_BY_STOPCOMMAND,///> 명령이 중지명령에 의해 중지 예정인 상태
-	GOS_CMD_FINISHED_NORMALLY,		///> 명령이 정상적으로 종료된 상태
-	GOS_CMD_FINISHED_BY_ASENSOR,	///> 명령이 리미터에 의해 종료된 상태
-	GOS_CMD_FINISHED_BY_STOPCOMMAND,///> 명령이 중지명령에 의해 중지된 상태
+	GOS_CMD_NONE = 0,				    ///> 명령이 없는 상태 (디비에는 있을 수 있음)
+	GOS_CMD_IGNORED_WRONGCOMMAND = 1,	///> 명령이 잘못된 명령이기 때문에 무시된 상태
+	GOS_CMD_IGNORED_BY_NEWCOMMAND = 2,	///> 명령이 새로운 명령으로 무시된 상태
+	GOS_CMD_IGNORED_BY_AUTOCONTROL = 3,	///> 명령이 수동 명령이라 자동동작상태에서는 무시된 상태
+	GOS_CMD_WAITING = 11,				///> 명령이 대기중인 상태
+	GOS_CMD_SENT = 12,					///> 명령이 전송된 상태
+	GOS_CMD_WORKING = 13,				///> 명령이 작동중인 상태
+	GOS_CMD_STOPPING_BY_ASENSOR = 21,	///> 명령이 리미터에 의해 중지 예정인 상태
+	GOS_CMD_STOPPING_BY_STOPCOMMAND = 22,///> 명령이 중지명령에 의해 중지 예정인 상태
+	GOS_CMD_FINISHED_NORMALLY = 31,		///> 명령이 정상적으로 종료된 상태
+	GOS_CMD_FINISHED_BY_ASENSOR = 32,	///> 명령이 리미터에 의해 종료된 상태
+	GOS_CMD_FINISHED_BY_STOPCOMMAND = 33,///> 명령이 중지명령에 의해 중지된 상태
 	GOS_CMD_STATMAX
 } gos_cmdstat_t;
 
