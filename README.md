@@ -43,7 +43,7 @@ git submodule init
 git submodule update
 ```
 
-단 libtp3는 [libuv](https://github.com/libuv/libuv) 를 사용하기 때문에 libuv 를 먼저 설치해주어야 한다. 더 상세한 설명은 libuv 홈페이지를 참조한다.
+단 libtp3는 [libuv](https://github.com/libuv/libuv) 를 사용하기 때문에 libuv 를 먼저 설치해주어야 합니다. 더 상세한 설명은 libuv 홈페이지를 참조하시길 바랍니다.
 ```
 wget https://github.com/libuv/libuv/archive/v1.x.zip
 unzip v1.x.zip -d v1.x
@@ -55,7 +55,7 @@ make install
 ```
 
 * [mysql](https://www.mysql.com)
-mysql 은 사용하는 OS에 따라 적절히 설치하면 된다. debian 계열의 Ubuntu나 Rasibian 등을 사용하는 경우에는 다음과 같이 설치할 수 있다.
+mysql 은 사용하는 OS에 따라 적절히 설치하면 됩니다. debian 계열의 Ubuntu나 Rasibian 등을 사용하는 경우에는 다음과 같이 설치할 수 있습니다.
 ```
 sudo apt install mysql-server
 ```
