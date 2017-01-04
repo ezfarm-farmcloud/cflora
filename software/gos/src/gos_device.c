@@ -1174,7 +1174,7 @@ gos_update_command_status (gos_cmd_t *pcmd, gos_cmdstat_t stat, cf_db_t *db) {
 		// 명령이 종료된 경우에는 업데이트후 완전 종료함.
         if (gos_is_command_finished (pcmd) || gos_is_command_ignored (pcmd)) {
 
-			CF_VERBOSE (CF_VERBOSE_HIGH, "A command (%d) of an actuator (%d) finished with status (%d).", pcmd->id, pcmd->deviceid, pcmd->stat);
+			CF_VERBOSE (CF_VERBOSE_MID, "A command (%d) of an actuator (%d) finished with status (%d).", pcmd->id, pcmd->deviceid, pcmd->stat);
 
 			gos_insert_control_history (pcmd, db);
 			gos_delete_control (pcmd, db);
@@ -1233,7 +1233,7 @@ gos_is_wrong_command (gos_cmd_t *pcmd) {
     if (pcmd->tm < 0 || pcmd->tm > _GOS_ACTARG_TIMEFILTER)
         return 1;
     // 모터형과 스위치형이 구분이 안되서 완벽한 상태는 아님.
-    if (pcmd->arg != _GOS_MOTOR_ARG_OPEN || pcmd->arg != _GOS_MOTOR_ARG_CLOSE)
+    if (pcmd->arg != _GOS_MOTOR_ARG_OPEN && pcmd->arg != _GOS_MOTOR_ARG_CLOSE)
         return 1;
     return 0;
 }

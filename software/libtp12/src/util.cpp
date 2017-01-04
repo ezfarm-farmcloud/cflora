@@ -102,10 +102,10 @@ int ReadDevice_Config(void)
 //	char						*sCH ;
 
 
-   //ini = iniparser_load((char*)"../../conf/cflora-device.ini");
-   ini = iniparser_load((char*)"./cflora-device.ini");
+   //ini = iniparser_load((char*)"../conf/cflora-device.ini");
+   ini = iniparser_load((char*)"../conf/cflora-device.ini");
    if (ini==NULL) {
-        fprintf(stderr, "cannot parse file: ../../conf/cflora-device.ini\n");
+        fprintf(stderr, "cannot parse file: ../conf/cflora-device.ini\n");
         return -1 ;
    }
 
@@ -234,7 +234,7 @@ int ReadDevice_Config(void)
 
 				if(i > 0) {
                     if (SI[b*16+i].data.id == 255)
-						break;
+						continue;
 					COMM_SENSOR[SENSOR_MAP[b*16].ARG].SENSOR_CNT= i + 1;
 					printf ("comm sensor [%d]\n", i + 1);
 				} else {
@@ -385,10 +385,10 @@ int ReadServer_Config(void)
         return -1 ;
     }
 */
-	//ini = iniparser_load((char*)"../../conf/cflora-server.ini");	
-	ini = iniparser_load((char*)"./cflora-server.ini");	
+	//ini = iniparser_load((char*)"../conf/cflora-server.ini");	
+	ini = iniparser_load((char*)"../conf/cflora-server.ini");	
 	if (ini==NULL) {
-        fprintf(stderr, "cannot parse file: ../../conf/cflora-server.ini\n");
+        fprintf(stderr, "cannot parse file: ../conf/cflora-server.ini\n");
         return -1 ;
     }
 

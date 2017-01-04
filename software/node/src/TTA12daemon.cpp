@@ -242,7 +242,7 @@ int TransOnStatusActuatorData( char mode )
 			//HexaPrint(  pk->GetBYTE(),pk->Getsize()  ) ;
 			send_msg( (char *)pk->GetBYTE(),pk->Getsize() ) ;
 
-/*
+//*
 			// ������Ŷ�� ������ �Ľ��Ͽ� Ȯ���ϴ� ��ƾ
 			TTAPtest.Clear() ;
 			TTAPtest.packet.Add( (BYTE *)pk->GetBYTE(),pk->Getsize() ) ;
@@ -257,11 +257,11 @@ int TransOnStatusActuatorData( char mode )
 				scount = TTAPtest.GetActuatorData( GetActData )  ;
 				for( int i = 0 ; i < scount ;i ++ )
 				{
-						printf( "ID:%d  VALUE:%04X\n" , GetActData[i].id , GetActData[i].value ) ;
+						printf( "ID:%d  VALUE:%04X\n\n" , GetActData[i].id , GetActData[i].value ) ;
 				}
 
 			}
-*/
+//*/
 
 
 		}
@@ -335,6 +335,7 @@ int TransActiveModeSensorData( char mode )
 	CPacket *pk ;
 	for(NODE_NUM=0; NODE_NUM < InstalledSensorNodeCount; NODE_NUM++)
 	{
+		NodeSensorDataCount = 0;
 		TTAPacket.Clear() ;
 		TTAPacket.SetFrameDevice( FCF_SENSOR ) ;
 		TTAPacket.SetFrameType( FTYPE_DATA ) ;
@@ -398,7 +399,7 @@ int TransActiveModeSensorData( char mode )
 						printf( "ID:%d  VALUE:%d\n" , GetSensorData[i].id , GetSensorData[i].value ) ;
 				}
 			}
-*/
+//*/
 
 		}
 		NodeSensorDataCount=0;
@@ -1332,8 +1333,8 @@ int main(int argc, char **argv)
 						// Response ��Ŷ�� ������ ��������
 						//2015.9.29 GCG���� RESPONSE PACKET �� ó���������� ���۾���,
 						//�����ϸ� GCG������ DATA ��Ŷ �̿ܿ���  No Data Packet ���� ǥ�õ�.
-						CPacket *rk = TTAParser.GetReturnPacket() ;
-						if( rk->Getsize() > 8 )	send_msg( (char *)rk->GetBYTE(),rk->Getsize() ) ;
+						//CPacket *rk = TTAParser.GetReturnPacket() ;
+						//if( rk->Getsize() > 8 )	send_msg( (char *)rk->GetBYTE(),rk->Getsize() ) ;
 
 					}
 
